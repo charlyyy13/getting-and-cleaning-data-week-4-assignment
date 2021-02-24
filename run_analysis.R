@@ -9,8 +9,6 @@
 library(data.table)
 library(dplyr)
 
-setwd("C:/Users/Charlotte/OneDrive/Documentos/R/Test123")
-getwd()
 ##############################################################################
 # STEP 0B - Read data
 ##############################################################################
