@@ -8,9 +8,10 @@
 #install packages
 library(data.table)
 library(dplyr)
+library(magrittr)
 
 ##############################################################################
-# STEP 0B - Read data
+# Read data
 ##############################################################################
 #Load data
 URL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
@@ -23,7 +24,7 @@ if (!file.exists("./UCI_HAR_Dataset")){
 }
 dateDownloaded <- date()
 
-##
+##read data
 xtest <- read.table((file.choose()))
 ytest <- read.table((file.choose()))
 subjecttest<- read.table((file.choose()))
@@ -32,11 +33,13 @@ xtrain <- read.table((file.choose()))
 ytrain <- read.table((file.choose()))
 subjecttrain<- read.table((file.choose()))
 
-# read features, don't convert text labels to factors
+# read features, without converting text labels to factors
 features <- read.table((file.choose()), as.is = TRUE)
 
 # read activity labels
 activities <- read.table(file.choose())
+
+#assign col names
 colnames(activities) <- c("activityId", "activityLabel")
 
 ##############################################################################
@@ -72,32 +75,27 @@ human <- total[, columnstokeep]
 ##############################################################################
 # Appropriately label the data set with descriptive variable names
 ##############################################################################
+
+human$activity <- factor(human$activity, levels = activities[,1], labels = activities[,2]) 
+human$subject  <- as.factor(human$subject) 
+
+total_mean <- human %>% group_by(activity, subject) %>% summarise_all(funs(mean)) 
+total_mean
+
 #colnames
-humancols <- colnames(human)
+humancols <- colnames(total_mean)
 humancols
 
 ## remove special characters
 humancols <- gsub("[\\(\\)-]", "", humancols)
 humancols
 
-# expand abbreviations and clean up names
-humancols <- gsub("^f", "frequencyDomain", humancols)
-humancols <- gsub("^t", "timeDomain", humancols)
-humancols <- gsub("Acc", "Accelerometer", humancols)
-humancols <- gsub("Gyro", "Gyroscope", humancols)
-humancols <- gsub("Mag", "Magnitude", humancols)
-humancols <- gsub("Freq", "Frequency", humancols)
-humancols <- gsub("mean", "Mean", humancols)
-humancols <- gsub("std", "StandardDeviation", humancols)
-humancols
-human
-
 ##############################################################################
 #creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 ##############################################################################
-total_mean <- human %>% group_by(activity, subject) %>% summarize_all(funs(mean)) 
-total_mean
+
 #export to file "tidydata.txt"
 write.table(total_mean, file = "./tidydata.txt", row.names = FALSE, col.names = TRUE) 
 
 rm(activities, features, x_total, y_total)
+
