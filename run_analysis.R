@@ -25,7 +25,9 @@ if (!file.exists("./UCI_HAR_Dataset")){
 dateDownloaded <- date()
 
 ##read data
+#test set
 xtest <- read.table((file.choose()))
+#test label
 ytest <- read.table((file.choose()))
 subjecttest<- read.table((file.choose()))
 
@@ -38,48 +40,44 @@ features <- read.table((file.choose()), as.is = TRUE)
 
 # read activity labels
 activities <- read.table(file.choose())
-
-#assign col names
-colnames(activities) <- c("activityId", "activityLabel")
-
-##############################################################################
-# Merge the training and the test sets to create one data set
-##############################################################################
-
 # merge of training and test sets
-x_total   <- rbind(xtrain, xtest)
-y_total   <- rbind(ytrain, ytest) 
-sub_total <- rbind(subjecttest,subjecttrain)
+#was called x_train y_train inclduding rbind (ytest,)
+train_total  <- cbind(xtrain, ytrain, subjecttrain)
+test_total   <- cbind(xtest, ytest, subjecttest) 
 
-# remove individual data tables to save memory
-rm(xtrain, subjecttrain, ytrain,xtest, subjecttest, ytest)
 
 #assign colnames - Use descriptive activity names to name the activities
-colnames(x_total)   <- features[,2]
-colnames(y_total)   <- "activity"
-colnames(sub_total) <- "subject"
+colnames(train_total) <- features[,2]
+colnames(test_total) <- features[,2]
 
 #merge final dataset
-total <- cbind(sub_total, y_total, x_total)
+total <- rbind(train_total, test_total)
+summary(total)
+#652 - label activities
+#653 - subject
+colnames(total)[563] <- "subject"
+colnames(total)[562] <- "activities"
 
 ##############################################################################
 #  Extracts only the measurements on the mean and standard deviation for each measurement
 ##############################################################################
 
-# determine columns of dataset to keep based on column name
-columnstokeep <- grepl("subject|activity|mean|std", colnames(total))
+# Keep columns based on column name -  mean and std (also activities and subject)
+human <- select(total, colnames(total) [grepl("mean|std|subject|activities",colnames(total))])
 
-# keep only data in these columns
-human <- total[, columnstokeep]
+##############################################################################
+#Uses descriptive activity names to name the activities in the data set
+##############################################################################
+human$activities <- factor(human$activities, levels = activities[,1], labels = activities[,2]) 
+human$subject  <- as.factor(human$subject) 
 
 ##############################################################################
 # Appropriately label the data set with descriptive variable names
+# and
+# creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 ##############################################################################
-
-human$activity <- factor(human$activity, levels = activities[,1], labels = activities[,2]) 
-human$subject  <- as.factor(human$subject) 
-
-total_mean <- human %>% group_by(activity, subject) %>% summarise_all(funs(mean)) 
+#with the average of each variable for each activity and each subject
+total_mean <- human %>% group_by(activities, subject) %>% summarise_all(funs(mean)) 
 total_mean
 
 #colnames
@@ -89,13 +87,11 @@ humancols
 ## remove special characters
 humancols <- gsub("[\\(\\)-]", "", humancols)
 humancols
-
-##############################################################################
-#creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-##############################################################################
+colnames(total_mean) <- humancols
 
 #export to file "tidydata.txt"
 write.table(total_mean, file = "./tidydata.txt", row.names = FALSE, col.names = TRUE) 
 
+# remove data
+rm(xtrain, subjecttrain, ytrain,xtest, subjecttest, ytest)
 rm(activities, features, x_total, y_total)
-
