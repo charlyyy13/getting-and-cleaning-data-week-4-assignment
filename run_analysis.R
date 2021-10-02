@@ -11,7 +11,7 @@ library(dplyr)
 library(magrittr)
 
 ##############################################################################
-# Read data
+#Read data
 ##############################################################################
 #Load data
 URL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
@@ -35,10 +35,10 @@ xtrain <- read.table((file.choose()))
 ytrain <- read.table((file.choose()))
 subjecttrain<- read.table((file.choose()))
 
-# read features, without converting text labels to factors
+#read features, without converting text labels to factors
 features <- read.table((file.choose()), as.is = TRUE)
 
-# read activity labels
+#read activity labels
 activities <- read.table(file.choose())
 
 ##############################################################################
@@ -62,10 +62,10 @@ colnames(total)[563] <- "subject"
 colnames(total)[562] <- "activities"
 
 ##############################################################################
-#  Extracts only the measurements on the mean and standard deviation for each measurement
+#Extracts only the measurements on the mean and standard deviation for each measurement
 ##############################################################################
 
-# Keep columns based on column name -  mean and std (also activities and subject)
+#keep columns based on column name -  mean and std (also activities and subject)
 human <- select(total, colnames(total) [grepl("mean|std|subject|activities",colnames(total))])
 
 ##############################################################################
@@ -75,9 +75,9 @@ human$activities <- factor(human$activities, levels = activities[,1], labels = a
 human$subject  <- as.factor(human$subject) 
 
 ##############################################################################
-# Appropriately label the data set with descriptive variable names
-# and
-# creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+#Appropriately label the data set with descriptive variable names
+#and
+#creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 ##############################################################################
 #with the average of each variable for each activity and each subject
 total_mean <- human %>% group_by(activities, subject) %>% summarise_all(funs(mean)) 
@@ -87,7 +87,7 @@ total_mean
 humancols <- colnames(total_mean)
 humancols
 
-## remove special characters
+##remove special characters
 humancols <- gsub("[\\(\\)-]", "", humancols)
 humancols
 colnames(total_mean) <- humancols
