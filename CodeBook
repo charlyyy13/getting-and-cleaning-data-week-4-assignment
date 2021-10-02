@@ -1,11 +1,11 @@
 Code book for Coursera Getting and Cleaning Data course project
 Aim is to indicate all the variables and summaries calculated, along with units, and any other relevant information.
 
-##Subject
+Subject
 =================
 Subject ID from 1 to 30
 
-##Activities 
+Activities 
 =================
 Comprises the 6 different activities: 
 1 WALKING
@@ -16,7 +16,7 @@ Comprises the 6 different activities:
 6 LAYING
 
 
-##Measurements (features)
+Measurements (features)
 =================
 
 The features selected for this database come from the accelerometer and gyroscope 3-axial raw signals tAcc-XYZ and tGyro-XYZ. These time domain signals (prefix 't' to denote time) were captured at a constant rate of 50 Hz. 
