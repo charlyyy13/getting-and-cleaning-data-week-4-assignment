@@ -40,11 +40,14 @@ features <- read.table((file.choose()), as.is = TRUE)
 
 # read activity labels
 activities <- read.table(file.choose())
+
+##############################################################################
+# Merge the training and the test sets to create one data set
+##############################################################################
 # merge of training and test sets
 #was called x_train y_train inclduding rbind (ytest,)
 train_total  <- cbind(xtrain, ytrain, subjecttrain)
 test_total   <- cbind(xtest, ytest, subjecttest) 
-
 
 #assign colnames - Use descriptive activity names to name the activities
 colnames(train_total) <- features[,2]
@@ -89,9 +92,20 @@ humancols <- gsub("[\\(\\)-]", "", humancols)
 humancols
 colnames(total_mean) <- humancols
 
+#appropriate label
+names(total_mean)<-gsub("Acc", "Accelerometer", names(total_mean))
+names(total_mean)<-gsub("Gyr","Gyroscope", names(total_mean))
+names(total_mean)<-gsub("^t", "Time", names(total_mean))
+names(total_mean)<-gsub("^f", "Frequency", names(total_mean))
+names(total_mean)
+
+##########################################################
+#Export to file "tidydata.txt"
+#############################
+
 #export to file "tidydata.txt"
 write.table(total_mean, file = "./tidydata.txt", row.names = FALSE, col.names = TRUE) 
 
-# remove data
+#remove data
 rm(xtrain, subjecttrain, ytrain,xtest, subjecttest, ytest)
 rm(activities, features, x_total, y_total)
